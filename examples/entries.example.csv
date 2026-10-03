@@ -1,0 +1,5 @@
+entry_number,title,user_display_name,user_id,comment,source_post_url
+001,Sample Photograph,Example User,@example,This is example data.,https://x.com/example/status/0000000000000000000
+002,星降る夜,サンプル太郎,@sample_taro,"静かな夜の海を撮影しました。
+波の少ない瞬間がお気に入りです。",https://x.com/sample_taro/status/0000000000000000001
+003,朝の港,Sample Hanako,@sample_hanako,これは架空のサンプルデータです。,

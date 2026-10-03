@@ -1,0 +1,38 @@
+{
+  "format": "label-system-entries",
+  "version": 1,
+  "entries": [
+    {
+      "title": "Sample Photograph",
+      "userDisplayName": "Example User",
+      "userId": "@example",
+      "comment": "This is example data.",
+      "source": {
+        "platform": "x",
+        "postId": "0000000000000000000",
+        "postUrl": "https://x.com/example/status/0000000000000000000"
+      }
+    },
+    {
+      "title": "星降る夜",
+      "userDisplayName": "サンプル太郎",
+      "userId": "@sample_taro",
+      "comment": "静かな夜の海を撮影しました。\n波の少ない瞬間がお気に入りです。",
+      "source": {
+        "platform": "x",
+        "postId": "0000000000000000001",
+        "postUrl": "https://x.com/sample_taro/status/0000000000000000001",
+        "originalText": "タイトル：星降る夜\n\n静かな夜の海を撮影しました。\n波の少ない瞬間がお気に入りです。\n\n#ExamplePhotoContest"
+      }
+    },
+    {
+      "title": "朝の港",
+      "userDisplayName": "Sample Hanako",
+      "userId": "@sample_hanako",
+      "comment": "これは架空のサンプルデータです。コメントが長い場合の自動改行を確認するため、少し長めの文章にしています。表示領域を超えると警告が表示されます。",
+      "source": {
+        "platform": "manual"
+      }
+    }
+  ]
+}

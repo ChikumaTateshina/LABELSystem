@@ -1,0 +1,34 @@
+name: Release
+
+# v1.2.3 形式のタグをpushすると、ブラウザ拡張とサーバ一式をReleaseへ添付する（仕様 §86）
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+      - name: Package
+        run: |
+          (cd apps/extension/dist && zip -r "../../../label-system-extension-${GITHUB_REF_NAME}.zip" .)
+          git archive --format=zip --prefix="label-system-${GITHUB_REF_NAME}/" \
+            -o "label-system-server-${GITHUB_REF_NAME}.zip" HEAD
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" label-system-*.zip --generate-notes

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LABELSystem サンプルテンプレート（A6横 148mm x 105mm / viewBox 1単位 = 0.1mm）
+  <text ...>{{変数}}</text> の形で書いた要素は、template.json の設定に従って
+  自動改行・文字サイズ調整が行われます。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="148mm" height="105mm" viewBox="0 0 1480 1050">
+  <rect x="0" y="0" width="1480" height="1050" fill="#ffffff"/>
+
+  <text id="entry_number" x="1380" y="118" text-anchor="end" fill="#8a8a8a" letter-spacing="2">{{entry_number}}</text>
+
+  <text id="title" x="100" y="230" fill="#1a1a1a">{{title}}</text>
+
+  <line x1="100" y1="372" x2="220" y2="372" stroke="#1a1a1a" stroke-width="3"/>
+
+  <text id="username" x="100" y="456" fill="#1a1a1a">{{username}}</text>
+
+  <text id="userid" x="100" y="508" fill="#8a8a8a">{{userid}}</text>
+
+  <text id="comment" x="100" y="620" fill="#333333">{{comment}}</text>
+</svg>

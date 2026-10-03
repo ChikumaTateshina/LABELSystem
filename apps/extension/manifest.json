@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "LABELSystem キャプション登録",
+  "description": "Xで開いている投稿の表示名・ユーザーID・本文を、ローカルのLABELSystemキャプションサーバへ登録します。",
+  "version": "1.0.0",
+
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://x.com/*"],
+
+  "action": {
+    "default_title": "キャプションへ登録",
+    "default_popup": "popup.html"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://x.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "label-system@example.invalid",
+      "strict_min_version": "115.0"
+    }
+  }
+}

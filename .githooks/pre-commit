@@ -1,0 +1,3 @@
+#!/bin/sh
+# 実データ・個人情報の誤commitを防ぐ。有効化: git config core.hooksPath .githooks
+exec node scripts/check-private-data.mjs --staged
