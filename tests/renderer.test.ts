@@ -3,37 +3,42 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import type { CaptionModel } from '../packages/shared-types/index.ts';
+import { toCaptionModel } from '../src/app.ts';
+import type { CaptionModel } from '../src/types.ts';
 import {
   CaptionRenderer,
+  extractFromCollection,
+  readFontFile,
   fitText,
   renderSvg,
   tokenize,
   wrapText,
   type Measure,
-} from '../packages/renderer/index.ts';
+} from '../src/render/index.ts';
 import {
   FsTemplateRepository,
+  decodeText,
+  loadTemplate,
   lengthToMm,
   mmToPt,
   mmToPx,
   substituteVariables,
   type Template,
-} from '../packages/template-engine/index.ts';
-import { fakeFonts } from './helpers.ts';
+} from '../src/template.ts';
+import { fakeFont, fakeFonts } from './helpers.ts';
 
 /** 全角 1em / 半角 0.5em */
 const measure: Measure = (text, size) =>
   Array.from(text).reduce((sum, ch) => sum + (ch.codePointAt(0)! < 0x2000 ? 0.5 : 1), 0) * size;
 const width10 = (text: string) => measure(text, 10);
 
-const model: CaptionModel = {
+const model: CaptionModel = toCaptionModel({
   title: '星降る夜',
   username: 'Example User',
   userid: '@example',
   comment: 'コメントです。',
-  entry_number: 'PC2026-001',
-};
+  no: 'PC2026-001',
+});
 
 function template(overrides: Partial<Template> = {}): Template {
   return {
@@ -249,4 +254,113 @@ test('PDF / PNG: SVGから生成でき、PDFは実寸のページサイズにな
   assert.equal(png.readUInt32BE(16), mmToPx(100, 72));
 
   assert.equal((await renderer.output(caption, 'svg')).toString(), caption.svg);
+});
+
+test('HTML: フォントファイルを @font-face として内包できる（.ttf / .otf のみ）', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'label-font-'));
+  const ttf = join(dir, 'Test Sans.ttf');
+  writeFileSync(ttf, Buffer.from('dummy font data'));
+  const renderer = new CaptionRenderer(fakeFonts(['Test Sans']));
+  const tpl = template({ html: '<p>{{title}}</p>', css: '.caption { font-family: "Test Sans"; }' });
+  const caption = { ...renderer.render(model, tpl), fonts: [{ ...fakeFont('Test Sans'), path: ttf }] };
+
+  const { html, notEmbedded } = renderer.toHtmlEmbedded([caption]);
+  assert.deepEqual(notEmbedded, []);
+  assert.match(html, /@font-face \{\n {2}font-family: "Test Sans";\n {2}src: url\(data:font\/ttf;base64,ZHVtbXkgZm9udCBkYXRh\) format\("truetype"\);\n\}/);
+  assert.ok(!renderer.toHtml([caption]).includes('@font-face'), '通常の出力では内包しない');
+
+  // 読み込めないフォントは内包せず、その名前を返す
+  const missing = { ...caption, fonts: [{ ...fakeFont('Test Sans'), path: join(dir, 'missing.ttf') }] };
+  const skipped = renderer.toHtmlEmbedded([missing]);
+  assert.deepEqual(skipped.notEmbedded, ['Test Sans']);
+  assert.ok(!skipped.html.includes('@font-face'));
+
+  // HTMLテンプレートが無い場合は、文字を輪郭にしたSVGを埋め込む
+  const svgOnly = renderer.toHtmlEmbedded([renderer.render(model, template())]);
+  assert.ok(svgOnly.html.includes('data-glyph-outlines') && !svgOnly.html.includes('<text'));
+});
+
+test('フォントコレクション（.ttc）から、指定した書体だけを単独のフォントとして取り出す', () => {
+  // 2書体・各2テーブルの最小のコレクションを組み立てる（'shar' は両方の書体が共有するテーブル）
+  const table = (text: string) => Buffer.from(text, 'latin1');
+  const shared = table('SHARED!'); // 7バイト（4バイト境界への詰め物が必要）
+  const own = [table('first-font'), table('second-font-data')];
+  const header = 12 + 2 * 4;
+  const fontHeader = 12 + 2 * 16;
+  const dataStart = header + fontHeader * 2;
+  const offsets = { shared: dataStart, own0: dataStart + 8, own1: dataStart + 8 + 12 };
+  const ttc = Buffer.alloc(offsets.own1 + 16);
+  ttc.write('ttcf', 0, 'latin1');
+  ttc.writeUInt32BE(0x00010000, 4);
+  ttc.writeUInt32BE(2, 8);
+  [0, 1].forEach((i) => {
+    const start = header + fontHeader * i;
+    ttc.writeUInt32BE(start, 12 + i * 4);
+    ttc.writeUInt32BE(i === 0 ? 0x00010000 : 0x4f54544f, start); // 2つ目は 'OTTO'
+    ttc.writeUInt16BE(2, start + 4);
+    const records: [string, number, number][] = [
+      ['shar', offsets.shared, shared.length],
+      ['own ', i === 0 ? offsets.own0 : offsets.own1, own[i].length],
+    ];
+    records.forEach(([tag, offset, length], r) => {
+      const record = start + 12 + r * 16;
+      ttc.write(tag, record, 'latin1');
+      ttc.writeUInt32BE(0xabcd0000 + r, record + 4);
+      ttc.writeUInt32BE(offset, record + 8);
+      ttc.writeUInt32BE(length, record + 12);
+    });
+  });
+  shared.copy(ttc, offsets.shared);
+  own[0].copy(ttc, offsets.own0);
+  own[1].copy(ttc, offsets.own1);
+
+  const read = (font: Buffer, index: number) => {
+    const record = 12 + index * 16;
+    const offset = font.readUInt32BE(record + 8);
+    return [font.toString('latin1', record, record + 4), font.toString('latin1', offset, offset + font.readUInt32BE(record + 12))];
+  };
+  const second = extractFromCollection(ttc, 1)!;
+  assert.equal(second.toString('latin1', 0, 4), 'OTTO');
+  assert.equal(second.readUInt16BE(4), 2);
+  assert.deepEqual(read(second, 0), ['shar', 'SHARED!']);
+  assert.deepEqual(read(second, 1), ['own ', 'second-font-data']);
+  assert.equal(second.readUInt32BE(12 + 8) % 4, 0, 'テーブルは4バイト境界に置く');
+  assert.equal(second.length, 12 + 32 + 8 + 16);
+  assert.deepEqual(read(extractFromCollection(ttc, 0)!, 1), ['own ', 'first-font']);
+
+  assert.equal(extractFromCollection(ttc, 2), null);
+  assert.equal(extractFromCollection(Buffer.from('not a collection'), 0), null);
+
+  // ファイルから読み込む場合: 書体を特定できなければ先頭の書体を使い、形式を判定する
+  const dir = mkdtempSync(join(tmpdir(), 'label-ttc-'));
+  writeFileSync(join(dir, 'fonts.ttc'), ttc);
+  const file = readFontFile({ path: join(dir, 'fonts.ttc'), postscriptName: 'Unknown' });
+  assert.equal(file?.format, 'truetype');
+  assert.deepEqual(read(file!.data, 1), ['own ', 'first-font']);
+  assert.equal(readFontFile({ path: join(dir, 'missing.ttc'), postscriptName: 'X' }), null);
+});
+
+test('テンプレートの文字コード: UTF-8 以外（Shift_JIS・UTF-16）で保存されたファイルも正しく読む', () => {
+  // 「星降る夜」を各文字コードで表したもの
+  const sjis = Buffer.from([0x90, 0xaf, 0x8d, 0x7e, 0x82, 0xe9, 0x96, 0xe9]);
+  assert.equal(decodeText(Buffer.concat([Buffer.from('<text>'), sjis, Buffer.from('</text>')])), '<text>星降る夜</text>');
+  assert.equal(decodeText(Buffer.from('星降る夜', 'utf8')), '星降る夜');
+  assert.equal(decodeText(Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from('星降る夜', 'utf8')])), '星降る夜', 'BOMは取り除く');
+  assert.equal(decodeText(Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from('星降る夜', 'utf16le')])), '星降る夜');
+  assert.equal(decodeText(Buffer.from('plain ascii')), 'plain ascii');
+
+  // Shift_JIS で保存されたテンプレートを読み込んでも、固定の文字が壊れない
+  const dir = mkdtempSync(join(tmpdir(), 'label-sjis-'));
+  writeFileSync(join(dir, 'template.json'), JSON.stringify({ id: 'sjis', width: '10mm', height: '10mm' }));
+  writeFileSync(
+    join(dir, 'template.svg'),
+    Buffer.concat([Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"><text x="0" y="0">'), sjis, Buffer.from('</text></svg>')]),
+  );
+  assert.ok(loadTemplate(dir).svg.includes('<text x="0" y="0">星降る夜</text>'));
+});
+
+test('改行計算: 段落の先頭の空白（字下げ）は残し、折り返した行の先頭の空白は捨てる', () => {
+  assert.deepEqual(wrapText('　あい\n　うえ', 50, width10), ['　あい', '　うえ']);
+  assert.deepEqual(wrapText('hello world foo', 60, width10), ['hello world', 'foo']);
+  assert.deepEqual(wrapText('あいうえお　かきく', 50, width10), ['あいうえお', 'かきく']);
 });

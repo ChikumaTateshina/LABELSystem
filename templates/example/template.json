@@ -9,10 +9,16 @@
   "fallbackFonts": ["Yu Gothic", "Hiragino Sans"],
 
   "fields": {
+    "category": {
+      "required": false,
+      "maxLines": 1,
+      "maxWidth": 900,
+      "fontSize": 30
+    },
     "entry_number": {
       "required": false,
       "maxLines": 1,
-      "maxWidth": 600,
+      "maxWidth": 300,
       "fontSize": 30
     },
     "title": {

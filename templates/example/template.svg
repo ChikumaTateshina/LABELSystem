@@ -7,6 +7,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="148mm" height="105mm" viewBox="0 0 1480 1050">
   <rect x="0" y="0" width="1480" height="1050" fill="#ffffff"/>
 
+  <text id="category" x="100" y="118" fill="#8a8a8a" letter-spacing="2">{{category}}</text>
+
   <text id="entry_number" x="1380" y="118" text-anchor="end" fill="#8a8a8a" letter-spacing="2">{{entry_number}}</text>
 
   <text id="title" x="100" y="230" fill="#1a1a1a">{{title}}</text>

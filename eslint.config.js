@@ -12,18 +12,28 @@ const browserGlobals = {
   URL: 'readonly',
   Blob: 'readonly',
   Node: 'readonly',
+  TextEncoder: 'readonly',
+  Event: 'readonly',
+  ResizeObserver: 'readonly',
+  TextDecoder: 'readonly',
+  Uint8Array: 'readonly',
+  FileReader: 'readonly',
+  Image: 'readonly',
+  DOMParser: 'readonly',
+  XMLSerializer: 'readonly',
+  btoa: 'readonly',
 };
 
 export default tseslint.config(
-  { ignores: ['node_modules/', 'apps/extension/dist/', 'data/', 'output/'] },
+  { ignores: ['node_modules/', 'extension/dist/', 'dist/', 'data/', 'output/'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ['apps/admin-web/**/*.js'],
+    files: ['src/ui/**/*.js'],
     languageOptions: { globals: browserGlobals },
   },
   {
     files: ['scripts/**/*.mjs'],
-    languageOptions: { globals: { console: 'readonly', process: 'readonly', URL: 'readonly' } },
+    languageOptions: { globals: { console: 'readonly', process: 'readonly', URL: 'readonly', Buffer: 'readonly' } },
   },
 );

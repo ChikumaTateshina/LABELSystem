@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>キャプションへ登録</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h1>作品登録</h1>
+
+  <div id="message" class="message" role="status" hidden></div>
+
+  <form id="form" hidden>
+    <div class="row">
+      <label>テーマ
+        <input id="theme" type="text" autocomplete="off">
+      </label>
+      <label>部門
+        <input id="category" type="text" autocomplete="off">
+      </label>
+    </div>
+    <label>タイトル
+      <input id="title" type="text" autocomplete="off">
+    </label>
+    <label>ユーザ名
+      <input id="username" type="text" autocomplete="off">
+    </label>
+    <label>ユーザID
+      <input id="userid" type="text" autocomplete="off" placeholder="@example">
+    </label>
+    <label>コメント
+      <textarea id="comment" rows="5"></textarea>
+    </label>
+    <div class="row">
+      <label>投稿日
+        <input id="date" type="text" autocomplete="off" placeholder="2026/09/28">
+      </label>
+      <label>元投稿URL
+        <input id="postUrl" type="url" autocomplete="off" placeholder="https://x.com/…/status/…">
+      </label>
+    </div>
+    <div class="actions">
+      <button type="button" id="cancel">キャンセル</button>
+      <button type="submit" id="submit" class="primary">スプレッドシートへ登録</button>
+    </div>
+  </form>
+
+  <div id="extra" class="actions" hidden></div>
+
+  <details class="settings" id="settings">
+    <summary>接続設定</summary>
+    <label>ウェブアプリのURL
+      <input id="sheetUrl" type="url" autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec">
+    </label>
+    <label>トークン
+      <input id="sheetToken" type="password" autocomplete="off">
+    </label>
+    <button type="button" id="saveSettings">接続して保存</button>
+  </details>
+
+  <script src="popup.js"></script>
+</body>
+</html>

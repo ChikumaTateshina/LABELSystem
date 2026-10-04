@@ -1,4 +1,4 @@
-import type { FontProvider, ResolvedFont } from '../packages/renderer/index.ts';
+import type { FontProvider, ResolvedFont } from '../src/render/index.ts';
 
 /** テスト用の固定幅フォント: 全角 1em / 半角 0.5em。U+1F000以降（絵文字）は収録していない扱い。 */
 export function fakeFont(family: string): ResolvedFont {
@@ -22,6 +22,7 @@ export function fakeFont(family: string): ResolvedFont {
           y: 0,
           fill: i === 0 ? 'rgb(255,176,46)' : null,
           opacity: 1,
+          glyph: i,
         })),
       };
     },
@@ -31,6 +32,7 @@ export function fakeFont(family: string): ResolvedFont {
 /** installed に含まれるファミリだけが「インストール済み」のFontProvider。 */
 export function fakeFonts(installed: string[]): FontProvider {
   return {
+    families: () => [...installed].sort(),
     resolve(families) {
       const hit = families.find((family) => installed.includes(family));
       return hit ? fakeFont(hit) : null;

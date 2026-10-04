@@ -14,6 +14,15 @@
   margin: 0;
 }
 
+.caption-category {
+  position: absolute;
+  top: 9mm;
+  left: 10mm;
+  font-size: 3mm;
+  letter-spacing: 0.2mm;
+  color: #8a8a8a;
+}
+
 .caption-number {
   position: absolute;
   top: 9mm;

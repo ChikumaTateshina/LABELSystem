@@ -11,8 +11,12 @@
 | [pdfkit](https://github.com/foliojs/pdfkit) | PDF生成・フォント埋め込み | MIT |
 | [svg-to-pdfkit](https://github.com/alafr/SVG-to-PDFKit) | SVG → PDF 変換 | MIT |
 | [fontkit](https://github.com/foliojs/fontkit) | フォント探索・文字幅の計測 | MIT |
-| [@resvg/resvg-js](https://github.com/yisibl/resvg-js) | SVG → PNG 変換 | MPL-2.0 |
+| [@resvg/resvg-wasm](https://github.com/yisibl/resvg-js) | SVG → PNG 変換（WASM） | MPL-2.0 |
 | [tsx](https://github.com/privatenumber/tsx) | TypeScriptの実行 | MIT |
+
+配布する `LABELSystem.exe` には、上記のライブラリに加えて [Node.js](https://nodejs.org/)（MIT License。
+同梱する第三者コードのライセンスは Node.js の LICENSE を参照）が含まれます。
+`@resvg/resvg-wasm`（MPL-2.0）は改変せずに同梱しており、ソースコードは上記リンク先で入手できます。
 
 ## 開発時のみ使用
 
@@ -21,7 +25,8 @@
 | [typescript](https://github.com/microsoft/TypeScript) | 型チェック | Apache-2.0 |
 | [esbuild](https://github.com/evanw/esbuild) | ブラウザ拡張のビルド | MIT |
 | [eslint](https://github.com/eslint/eslint) / [typescript-eslint](https://github.com/typescript-eslint/typescript-eslint) | Lint | MIT |
-| [linkedom](https://github.com/WebReflection/linkedom) | X Extractor のテスト用DOM | ISC |
+| [linkedom](https://github.com/WebReflection/linkedom) | ブラウザ拡張のテスト用DOM | ISC |
+| [postject](https://github.com/nodejs/postject) | 単一実行ファイルの生成 | MIT |
 
 ## フォント・素材
 

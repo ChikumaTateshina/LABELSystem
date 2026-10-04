@@ -1,0 +1,52 @@
+:root { color-scheme: light dark; }
+
+body {
+  width: 360px;
+  margin: 0;
+  padding: 14px 16px;
+  font: 13px/1.5 "Noto Sans JP", "Yu Gothic UI", "Hiragino Sans", system-ui, sans-serif;
+}
+
+h1 { margin: 0 0 10px; font-size: 15px; }
+
+label { display: block; margin-bottom: 8px; font-size: 11px; font-weight: 600; opacity: 0.85; }
+
+input, textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 3px;
+  padding: 6px 8px;
+  border: 1px solid #8884;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 400;
+}
+textarea { resize: vertical; }
+
+button, a.button {
+  padding: 6px 14px;
+  border: 1px solid #8886;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+button.primary { border-color: #2f5d50; background: #2f5d50; color: #fff; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; }
+
+.message { margin-bottom: 10px; padding: 8px 10px; border-radius: 5px; white-space: pre-line; background: #8882; }
+.message.error { background: #a33a2c22; border: 1px solid #a33a2c88; }
+.message.success { background: #2f5d5022; border: 1px solid #2f5d5088; }
+
+.settings { margin-top: 14px; padding-top: 8px; border-top: 1px solid #8884; }
+.settings summary { cursor: pointer; font-size: 11px; opacity: 0.75; }
+.settings label { margin-top: 8px; }
+
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }

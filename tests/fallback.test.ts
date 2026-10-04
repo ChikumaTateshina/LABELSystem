@@ -1,17 +1,18 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { CaptionModel } from '../packages/shared-types/index.ts';
-import { FontStack, graphemes, renderSvg, tokenize, wrapText } from '../packages/renderer/index.ts';
-import type { Template } from '../packages/template-engine/index.ts';
+import { toCaptionModel } from '../src/app.ts';
+import type { CaptionModel } from '../src/types.ts';
+import { FontStack, graphemes, renderSvg, tokenize, wrapText } from '../src/render/index.ts';
+import type { Template } from '../src/template.ts';
 import { fakeFont, fakeFonts } from './helpers.ts';
 
-const model: CaptionModel = {
+const model: CaptionModel = toCaptionModel({
   title: '星降る夜',
   username: 'Example User',
   userid: '@example',
   comment: '',
-  entry_number: 'PC2026-001',
-};
+  no: 'PC2026-001',
+});
 
 function template(svgText: string): Template {
   return {
@@ -102,4 +103,49 @@ test('SVG: 代替フォントも無い文字は従来どおり警告する', () 
   );
   assert.deepEqual(caption.warnings.map((w) => `${w.code}:${w.level}`), ['glyph-missing:warning']);
   assert.match(caption.svg, /<tspan x="50" dy="0">夜🌙<\/tspan>/);
+});
+
+test('アウトライン化: すべての文字（固定の文字を含む）を輪郭にし、<text> を残さない', () => {
+  const tpl = template(
+    '<text id="comment" x="50" y="100" fill="#333">{{comment}}</text>' +
+      '<text x="900" y="50" text-anchor="end" font-size="20" letter-spacing="10" fill="#888">A&amp;B</text>',
+  );
+  const caption = renderSvg({ ...model, comment: 'あい' }, tpl, installed, { outlineText: true });
+  assert.ok(!caption.svg.includes('<text'), '文字要素は残らない');
+  assert.ok(!caption.svg.includes('<tspan'));
+  // 項目: 「あい」は x=50, y=100, 20/1000 倍で描く
+  assert.match(caption.svg, /<g data-field="comment"[^>]*><g fill="#333" transform="translate\(50 100\) scale\(0\.02 -0\.02\)"><title>あい<\/title>/);
+  // 固定の文字: 幅 = 3文字 × 10 + 字間 10 × 3 = 60。右揃えなので 900 - 60 から描き始め、字間の分だけ各文字をずらす
+  assert.match(caption.svg, /<g fill="#888" transform="translate\(840 50\) scale\(0\.02 -0\.02\)"><title>A&amp;B<\/title>/);
+  assert.match(caption.svg, /transform="translate\(1500 0\)"/, '2文字目は 1000 + 字間 10 / 0.02 = 1500');
+
+  // 通常のレンダリングでは文字のまま
+  assert.ok(renderSvg({ ...model, comment: 'あい' }, tpl, installed).svg.includes('<tspan x="50" dy="0">あい</tspan>'));
+});
+
+test('上下の揃え: 行数が最大行数より少ないとき、枠の中央・下端へ寄せる', () => {
+  const svg = '<text id="comment" x="50" y="100">{{comment}}</text>';
+  const withAlign = (valign?: 'top' | 'middle' | 'bottom') => ({
+    ...template(svg),
+    // 文字サイズ 20・行送り 1.5 倍（30）・最大3行 → 枠は 1行目 y=100 〜 3行目 y=160
+    fields: { comment: { maxLines: 3, maxWidth: 400, fontSize: 20, minFontSize: 20, lineHeight: 1.5, valign } },
+  });
+  const firstDy = (text: string, valign?: 'top' | 'middle' | 'bottom') =>
+    /<tspan x="50" dy="([^"]+)"/.exec(renderSvg({ ...model, comment: text }, withAlign(valign), installed).svg)?.[1];
+
+  assert.equal(firstDy('あ'), '0');
+  assert.equal(firstDy('あ', 'top'), '0');
+  assert.equal(firstDy('あ', 'middle'), '30', '1行なら、2行目の位置（中央）に置く');
+  assert.equal(firstDy('あ', 'bottom'), '60', '1行なら、3行目の位置（下端）に置く');
+  assert.equal(firstDy('あ\nい', 'middle'), '15');
+  assert.equal(firstDy('あ\nい', 'bottom'), '30');
+  assert.equal(firstDy('あ\nい\nう', 'middle'), '0', '枠いっぱいのときは動かさない');
+  assert.equal(firstDy('あ\nい\nう\nえ', 'bottom'), '0', 'あふれているときは上から並べる');
+
+  // 2行目以降の行送りは変わらない
+  assert.match(renderSvg({ ...model, comment: 'あ\nい' }, withAlign('bottom'), installed).svg, /dy="30">あ<\/tspan><tspan x="50" dy="30">い/);
+  // 絵文字を含む行（輪郭として描く）も、同じだけずれる
+  const mixed = renderSvg({ ...model, comment: 'あ🌙' }, withAlign('bottom'), installed).svg;
+  assert.match(mixed, /<tspan x="50" dy="60">あ<\/tspan>/);
+  assert.match(mixed, /translate\(70 160\)/);
 });

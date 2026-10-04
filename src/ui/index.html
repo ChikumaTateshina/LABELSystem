@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LABELSystem</title>
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="progress" aria-hidden="true"></div>
+  <header class="topbar">
+    <span class="brand">LABELSystem <small class="build"><!--build--></small></span>
+    <button type="button" class="btn btn-quiet" id="reload">再読み込み</button>
+    <button type="button" class="btn btn-quiet" id="open-output">出力フォルダ</button>
+    <button type="button" class="btn btn-quiet" id="open-settings">接続設定</button>
+  </header>
+
+  <main id="view" class="view"></main>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <script src="blocks.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

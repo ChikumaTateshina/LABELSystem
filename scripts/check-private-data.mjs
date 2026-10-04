@@ -9,13 +9,12 @@ import { execFileSync } from 'node:child_process';
 const staged = process.argv.includes('--staged');
 
 const RULES = [
-  { pattern: /\.(sqlite3?|db)(-wal|-shm)?$/i, reason: 'データベースファイル' },
-  { pattern: /^data\/(?!\.gitkeep$)/, reason: 'data/ 配下の運用データ' },
-  { pattern: /^output\/(?!\.gitkeep$)/, reason: 'output/ 配下の出力ファイル' },
+  { pattern: /^data\//, reason: 'data/ 配下（接続設定を含む）' },
+  { pattern: /^output\//, reason: 'output/ 配下の出力ファイル' },
   { pattern: /(^|\/)\.env(\.(?!example$)[^/]*)?$/, reason: '環境変数ファイル' },
-  { pattern: /(^|\/)config\.json$/, reason: '本番用設定ファイル（config.example.json のみ公開する）' },
-  { pattern: /(^|\/)entries\.(json|csv)$/, reason: '作品データのエクスポート' },
+  { pattern: /(^|\/)config\.json$/, reason: '本番用設定ファイル（接続URL・トークンを含む。config.example.json のみ公開する）' },
   { pattern: /\.(pem|key|p12|pfx)$/i, reason: '秘密鍵' },
+  { pattern: /(^dist\/|\.exe$)/i, reason: 'ビルド成果物（ReleaseへはGitHub Actionsが添付する）' },
   { pattern: /\.(ttf|otf|ttc|otc|woff2?)$/i, reason: 'フォントファイル（再配布可否を確認し、data/assets/fonts/ へ置く）' },
 ];
 

@@ -1,6 +1,6 @@
 name: Release
 
-# v1.2.3 形式のタグをpushすると、ブラウザ拡張とサーバ一式をReleaseへ添付する（仕様 §86）
+# v1.2.3 形式のタグをpushすると、インストール不要の実行ファイルとブラウザ拡張をReleaseへ添付する（仕様 §86）
 on:
   push:
     tags: ['v*.*.*']
@@ -10,7 +10,8 @@ permissions:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    # 配布する exe は Windows 用のため、Windows 上でビルドする
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,15 +21,15 @@ jobs:
 
       - run: npm ci
       - run: npm test
-      - run: npm run build
+      - run: npm run build:exe
 
       - name: Package
+        shell: pwsh
         run: |
-          (cd apps/extension/dist && zip -r "../../../label-system-extension-${GITHUB_REF_NAME}.zip" .)
-          git archive --format=zip --prefix="label-system-${GITHUB_REF_NAME}/" \
-            -o "label-system-server-${GITHUB_REF_NAME}.zip" HEAD
+          Compress-Archive -Path extension/dist/* -DestinationPath "label-system-extension-$env:GITHUB_REF_NAME.zip"
 
       - name: Create GitHub Release
+        shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" label-system-*.zip --generate-notes
+        run: gh release create "$env:GITHUB_REF_NAME" dist/LABELSystem.exe "label-system-extension-$env:GITHUB_REF_NAME.zip" --generate-notes

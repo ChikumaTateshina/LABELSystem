@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { parseHTML } from 'linkedom';
-import { ExtractionError, XPostExtractor } from '../packages/x-extractor/index.ts';
+import { ExtractionError, XPostExtractor } from '../extension/src/xPostExtractor.ts';
 
 /** 匿名化したHTML fixtureを読み込む。Xの実サイトへはアクセスしない（仕様 §84）。 */
 function extractor(fixture: string, pageUrl: string): XPostExtractor {
@@ -23,7 +23,7 @@ test('single-post: 表示名・ユーザーID・本文・URL・投稿IDを取得
     post.text,
     'タイトル：星降る夜\n\n夜の海を撮影しました。\n静かな感じがお気に入りです。\n\n#ExamplePhotoContest',
   );
-  assert.ok(!Number.isNaN(Date.parse(post.capturedAt ?? '')));
+  assert.equal(post.postedAt, '2026-09-28T03:00:00.000Z');
 });
 
 test('post-with-image: 絵文字（img alt）を文字として取得し、画像リンクをURLと誤認しない', async () => {

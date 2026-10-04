@@ -1,11 +1,8 @@
 node_modules/
 
-# 運用固有データ（応募者情報を含むため公開リポジトリへ含めない）
-data/*
-!data/.gitkeep
-
-output/*
-!output/.gitkeep
+# 接続設定（URL・トークン）と出力ファイル。公開リポジトリへ含めない
+data/
+output/
 
 *.sqlite
 *.sqlite3
@@ -18,7 +15,8 @@ output/*
 !.env.example
 
 # ビルド成果物
-apps/extension/dist/
+extension/dist/
+dist/
 *.zip
 
 # OS / editor
