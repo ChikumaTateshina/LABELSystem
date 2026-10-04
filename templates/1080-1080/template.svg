@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LABELSystem 同梱テンプレート: 正方形（1080×1080）
+  SNSの投稿画像などの正方形向け。PNG は 1080 x 1080 ピクセルで出力されます（1単位 = 1px）。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1080px" height="1080px" viewBox="0 0 1080 1080">
+  <rect x="0" y="0" width="1080" height="1080" fill="#ffffff"/>
+  <text id="category" x="80" y="110" fill="#6e6e6e" letter-spacing="1">{{category}}</text>
+  <text id="no" x="1000" y="110" fill="#6e6e6e" text-anchor="end">{{no}}</text>
+  <text id="title" x="80" y="240" fill="#1a1a1a">{{title}}</text>
+  <line x1="80" y1="400" x2="240" y2="400" stroke="#1a1a1a" stroke-width="6"/>
+  <text id="username" x="80" y="490" fill="#1a1a1a">{{username}}</text>
+  <text id="userid" x="80" y="548" fill="#6e6e6e">{{userid}}</text>
+  <text id="comment" x="80" y="660" fill="#333333">{{comment}}</text>
+</svg>

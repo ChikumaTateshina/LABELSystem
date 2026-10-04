@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LABELSystem 同梱テンプレート: 名刺サイズ（91×55mm）
+  印刷用の小さなキャプション向け（1単位 = 0.1mm）。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="91mm" height="55mm" viewBox="0 0 910 550">
+  <rect x="0" y="0" width="910" height="550" fill="#ffffff"/>
+  <text id="no" x="850" y="78" fill="#8a8a8a" text-anchor="end">{{no}}</text>
+  <text id="title" x="60" y="150" fill="#1a1a1a">{{title}}</text>
+  <line x1="60" y1="262" x2="140" y2="262" stroke="#1a1a1a" stroke-width="3"/>
+  <text id="username" x="60" y="336" fill="#1a1a1a">{{username}}</text>
+  <text id="userid" x="60" y="380" fill="#8a8a8a">{{userid}}</text>
+  <text id="comment" x="60" y="452" fill="#333333">{{comment}}</text>
+</svg>

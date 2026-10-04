@@ -1,0 +1,140 @@
+.caption {
+  background: #ffffff;
+  color: #1a1a1a;
+  font-family: "Noto Sans JP", "Noto Sans CJK JP", "Yu Gothic", "Hiragino Sans", sans-serif;
+}
+
+.caption .b {
+  position: absolute;
+  margin: 0;
+}
+
+.caption .t {
+  display: flex;
+  align-items: baseline;
+}
+
+.caption .s {
+  flex: none;
+  width: 0;
+}
+
+.caption .t p {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.caption .v {
+  display: flex;
+  flex-direction: column;
+}
+
+.b2 {
+  top: 3.4mm;
+  left: 65mm;
+  width: 20mm;
+  font-size: 2.2mm;
+  line-height: 1.5;
+  color: #8a8a8a;
+}
+
+.b2 .s {
+  height: 4.4mm;
+}
+
+.b2 p {
+  text-align: right;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  max-height: 1.5em;
+}
+
+.b3 {
+  top: 4.6mm;
+  left: 6mm;
+  width: 79mm;
+  font-size: 5.2mm;
+  line-height: 1.3;
+  color: #1a1a1a;
+}
+
+.b3 .s {
+  height: 10.4mm;
+}
+
+.b3 p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  max-height: 2.6em;
+}
+
+.b4 {
+  left: 6mm;
+  top: 26.05mm;
+  width: 8mm;
+  height: 0.3mm;
+  background: #1a1a1a;
+}
+
+.b5 {
+  top: 26.4mm;
+  left: 6mm;
+  width: 79mm;
+  font-size: 3.6mm;
+  line-height: 1.5;
+  color: #1a1a1a;
+}
+
+.b5 .s {
+  height: 7.2mm;
+}
+
+.b5 p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  max-height: 1.5em;
+}
+
+.b6 {
+  top: 33.2mm;
+  left: 6mm;
+  width: 79mm;
+  font-size: 2.4mm;
+  line-height: 1.5;
+  color: #8a8a8a;
+}
+
+.b6 .s {
+  height: 4.8mm;
+}
+
+.b6 p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  max-height: 1.5em;
+}
+
+.b7 {
+  top: 40.8mm;
+  left: 6mm;
+  width: 79mm;
+  font-size: 2.2mm;
+  line-height: 1.5;
+  color: #333333;
+}
+
+.b7 .s {
+  height: 4.4mm;
+}
+
+.b7 p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  max-height: 3em;
+}

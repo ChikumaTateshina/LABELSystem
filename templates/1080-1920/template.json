@@ -1,0 +1,59 @@
+{
+  "id": "1080-1920",
+  "name": "9:16 縦長（1080×1920）",
+  "version": "1.0",
+  "width": "1080px",
+  "height": "1920px",
+  "fonts": [
+    "Noto Sans JP",
+    "Noto Sans CJK JP"
+  ],
+  "fallbackFonts": [
+    "Yu Gothic",
+    "Hiragino Sans"
+  ],
+  "fields": {
+    "category": {
+      "required": false,
+      "maxLines": 1,
+      "maxWidth": 900,
+      "fontSize": 40
+    },
+    "title": {
+      "required": true,
+      "maxLines": 3,
+      "maxWidth": 900,
+      "fontSize": 76,
+      "lineHeight": 1.3,
+      "minFontSize": 54
+    },
+    "username": {
+      "required": true,
+      "maxLines": 1,
+      "maxWidth": 900,
+      "fontSize": 52,
+      "minFontSize": 38
+    },
+    "userid": {
+      "required": true,
+      "maxLines": 1,
+      "maxWidth": 900,
+      "fontSize": 38,
+      "minFontSize": 28
+    },
+    "comment": {
+      "required": false,
+      "maxLines": 11,
+      "maxWidth": 900,
+      "fontSize": 40,
+      "lineHeight": 1.7,
+      "minFontSize": 32
+    },
+    "no": {
+      "required": false,
+      "maxLines": 1,
+      "maxWidth": 300,
+      "fontSize": 32
+    }
+  }
+}

@@ -5,7 +5,7 @@
  * 必要なリソースは scripts/build-exe.mjs が `label-embedded` として埋め込む。
  * 起動時に、exeと同じフォルダへ次のものを書き出す:
  *
- *   templates/example/  サンプルテンプレート（無い場合のみ。複製して自分のデザインを作れる）
+ *   templates/          同梱テンプレート（無いものだけ。複製して自分のデザインを作れる）
  *   extension/          ブラウザ拡張（Xからの取り込み用。ブラウザへ読み込む）
  *   gas/Code.gs         スプレッドシートへ貼り付けるスクリプト
  *   licenses/           ライセンス表示
@@ -58,8 +58,17 @@ function main(): Promise<void> {
 
   servePdfkitData();
   setResvgWasm(embedded('resvg.wasm'));
-  if (!fs.existsSync(join(paths.templatesDir, 'example', 'template.json'))) {
-    extract('templates/', paths.templatesDir, false);
+  // 同梱テンプレートは、まだ無いものだけを書き出す。
+  // 新しい版で追加されたテンプレートは増え、利用者が書き換えたテンプレートは上書きしない
+  const bundled = new Set(
+    Object.keys(files)
+      .filter((name) => name.startsWith('templates/'))
+      .map((name) => name.split('/')[1]),
+  );
+  for (const id of bundled) {
+    if (!fs.existsSync(join(paths.templatesDir, id, 'template.json'))) {
+      extract(`templates/${id}/`, join(paths.templatesDir, id), false);
+    }
   }
   extract('extension/', join(baseDir, 'extension'), true);
   extract('gas/', join(baseDir, 'gas'), true);

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LABELSystem 同梱テンプレート: 帯・名札（1920×480）
+  作品の下に置く横長の名札向け（タイトル・ユーザ名・ユーザID）。PNG は 1920 x 480 ピクセルで出力されます。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1920px" height="480px" viewBox="0 0 1920 480">
+  <rect x="0" y="0" width="1920" height="480" fill="#1f1f1f"/>
+  <text id="category" x="100" y="84" fill="#c8c8c8" letter-spacing="1">{{category}}</text>
+  <text id="no" x="1820" y="84" fill="#c8c8c8" text-anchor="end">{{no}}</text>
+  <text id="title" x="100" y="214" fill="#ffffff">{{title}}</text>
+  <line x1="100" y1="268" x2="1820" y2="268" stroke="#ffffff" stroke-width="4"/>
+  <text id="username" x="100" y="372" fill="#ffffff">{{username}}</text>
+  <text id="userid" x="1820" y="372" fill="#c8c8c8" text-anchor="end">{{userid}}</text>
+</svg>

@@ -16,6 +16,9 @@ import { fakeFonts } from './helpers.ts';
 
 const rootDir = fileURLToPath(new URL('..', import.meta.url));
 
+/** 同梱しているテンプレート */
+const BUNDLED = ['1080-1080', '1080-1920', '1920-1080', '1920-1080-light', '1920-480', 'card-91-55', 'example'];
+
 let gas: FakeGas;
 let app: LabelApp;
 let paths: AppPaths;
@@ -40,7 +43,7 @@ after(() => gas.close());
 test('初回: 未設定の状態で起動でき、テンプレートは選べる', () => {
   const state = app.state();
   assert.equal(state.configured, false);
-  assert.deepEqual(state.templates.map((t) => t.id), ['example']);
+  assert.deepEqual(state.templates.map((t) => t.id).sort(), BUNDLED);
   assert.equal(state.template, 'example');
 });
 
@@ -198,12 +201,12 @@ test('テンプレート: 画面から複製・編集・保存でき、保存前
   assert.ok(preview.html.startsWith('<!DOCTYPE html>'));
   assert.ok(preview.html.includes('<h1 class="mine">星降る夜 / 最優秀賞</h1>'));
   assert.ok(preview.html.includes('.mine { color: #cc0000; }'));
-  assert.deepEqual(app.state().templates.map((t) => t.id), ['example'], 'プレビューだけでは保存されない');
+  assert.deepEqual(app.state().templates.map((t) => t.id).sort(), BUNDLED, 'プレビューだけでは保存されない');
 
   const saved = (await app.handle('saveTemplate', { files: edited })) as { saved: string; templates: { id: string }[]; template: string };
   assert.equal(saved.saved, 'my-design');
   assert.equal(saved.template, 'my-design');
-  assert.deepEqual(saved.templates.map((t) => t.id).sort(), ['example', 'my-design']);
+  assert.deepEqual(saved.templates.map((t) => t.id).sort(), [...BUNDLED, 'my-design'].sort());
   assert.equal(readFileSync(join(paths.dataDir, 'templates', 'my-design', 'template.css'), 'utf8'), '.mine { color: #cc0000; }');
 
   // HTML / CSS を空にして保存すると、SVGを埋め込んだHTMLを出力するテンプレートになる
@@ -335,4 +338,33 @@ test('加筆修正: スプレッドシートを変えずに、このPCの中だ�
   assert.equal(ignored.no, '1');
   assert.equal(ignored.original, undefined);
   assert.equal(gas.sheet.writes.length, writesBefore);
+});
+
+test('同梱テンプレート: すべて読み込めて、各形式で出力でき、特定のイベントの素材を含まない', async () => {
+  const [row] = await app.rows();
+  for (const id of BUNDLED) {
+    const files = (await app.handle('templateFiles', { templateId: id })) as { json: string; svg: string; html: string; css: string };
+    assert.equal(JSON.parse(files.json).id, id);
+    assert.ok(files.html && files.css, `${id}: HTML出力用のファイルがある`);
+    // 配布するテンプレートには、画像（ロゴ）や特定のイベント名を入れない
+    for (const text of [files.svg, files.html]) assert.ok(!/data:image|#VSP|フォトコン/.test(text), `${id}: 素材を含まない`);
+
+    const preview = app.preview(row, id);
+    assert.ok(preview.svg.includes('星降る夜'), `${id}: タイトルが差し込まれる`);
+    assert.deepEqual(preview.warnings.filter((w) => w.level === 'warning'), [], `${id}: 短い文章では警告が出ない`);
+  }
+
+  // ピクセルで指定したテンプレートは、PNG がその画素数で出力される
+  const sizes: Record<string, [number, number]> = {
+    '1920-1080': [1920, 1080],
+    '1920-1080-light': [1920, 1080],
+    '1080-1080': [1080, 1080],
+    '1080-1920': [1080, 1920],
+    '1920-480': [1920, 480],
+  };
+  for (const [id, size] of Object.entries(sizes)) {
+    const result = await app.output([row], ['png'], id, false);
+    const png = readFileSync(join(paths.outputDir, result.files[0]));
+    assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], size, id);
+  }
 });

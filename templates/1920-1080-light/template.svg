@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LABELSystem 同梱テンプレート: 16:9 横長（1920×1080・淡色）
+  画面・画像向け。PNG は 1920 x 1080 ピクセルで出力されます（1単位 = 1px）。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1920px" height="1080px" viewBox="0 0 1920 1080">
+  <rect x="0" y="0" width="1920" height="1080" fill="#ffffff"/>
+  <text id="category" x="100" y="100" fill="#1a1a1a" letter-spacing="1">{{category}}</text>
+  <text id="award" x="1820" y="100" fill="#1a1a1a" text-anchor="end">{{award}}</text>
+  <text id="theme" x="100" y="182" fill="#6e6e6e">{{theme}}</text>
+  <text id="title" x="100" y="300" fill="#1a1a1a">{{title}}</text>
+  <line x1="100" y1="440" x2="1820" y2="440" stroke="#1a1a1a" stroke-width="10"/>
+  <text id="username" x="100" y="520" fill="#1a1a1a">{{username}}</text>
+  <text id="userid" x="100" y="600" fill="#6e6e6e">{{userid}}</text>
+  <text id="comment" x="100" y="700" fill="#1a1a1a">{{comment}}</text>
+  <text id="no" x="1820" y="1040" fill="#6e6e6e" text-anchor="end">{{no}}</text>
+</svg>

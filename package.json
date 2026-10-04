@@ -1,6 +1,6 @@
 {
   "name": "label-system",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "LABELSystem - Layout and Artwork Bibliographic Entry Layer: フォトコンテスト用キャプション生成システム",
   "private": true,
   "type": "module",

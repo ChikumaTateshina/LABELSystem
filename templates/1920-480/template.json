@@ -1,0 +1,50 @@
+{
+  "id": "1920-480",
+  "name": "帯・名札（1920×480）",
+  "version": "1.0",
+  "width": "1920px",
+  "height": "480px",
+  "fonts": [
+    "Noto Sans JP",
+    "Noto Sans CJK JP"
+  ],
+  "fallbackFonts": [
+    "Yu Gothic",
+    "Hiragino Sans"
+  ],
+  "fields": {
+    "category": {
+      "required": false,
+      "maxLines": 1,
+      "maxWidth": 1200,
+      "fontSize": 34
+    },
+    "no": {
+      "required": false,
+      "maxLines": 1,
+      "maxWidth": 300,
+      "fontSize": 30
+    },
+    "title": {
+      "required": true,
+      "maxLines": 1,
+      "maxWidth": 1720,
+      "fontSize": 96,
+      "minFontSize": 56
+    },
+    "username": {
+      "required": true,
+      "maxLines": 1,
+      "maxWidth": 1100,
+      "fontSize": 58,
+      "minFontSize": 40
+    },
+    "userid": {
+      "required": true,
+      "maxLines": 1,
+      "maxWidth": 560,
+      "fontSize": 44,
+      "minFontSize": 30
+    }
+  }
+}

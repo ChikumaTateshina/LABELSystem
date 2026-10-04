@@ -1,0 +1,201 @@
+.caption {
+  background: #343434;
+  color: #1a1a1a;
+  font-family: "Noto Sans JP", "Noto Sans CJK JP", "Yu Gothic", "Hiragino Sans", sans-serif;
+}
+
+.caption .b {
+  position: absolute;
+  margin: 0;
+}
+
+.caption .t {
+  display: flex;
+  align-items: baseline;
+}
+
+.caption .s {
+  flex: none;
+  width: 0;
+}
+
+.caption .t p {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.caption .v {
+  display: flex;
+  flex-direction: column;
+}
+
+.b2 {
+  top: 0mm;
+  left: 26.458mm;
+  width: 238.125mm;
+  font-size: 13.229mm;
+  line-height: 1.5;
+  color: #ffffff;
+  letter-spacing: 0.265mm;
+}
+
+.b2 .s {
+  height: 26.458mm;
+}
+
+.b2 p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  max-height: 1.5em;
+}
+
+.b3 {
+  top: 5.292mm;
+  left: 280.458mm;
+  width: 201.083mm;
+  font-size: 10.583mm;
+  line-height: 1.5;
+  color: #ffffff;
+}
+
+.b3 .s {
+  height: 21.167mm;
+}
+
+.b3 p {
+  text-align: right;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  max-height: 1.5em;
+}
+
+.b4 {
+  top: 25.4mm;
+  left: 26.458mm;
+  width: 406.4mm;
+  font-size: 11.377mm;
+  line-height: 1.5;
+  color: #c8c8c8;
+}
+
+.b4 .s {
+  height: 22.754mm;
+}
+
+.b4 p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  max-height: 1.5em;
+}
+
+.b5 {
+  top: 60.762mm;
+  height: 46.302mm;
+  justify-content: center;
+  left: 26.458mm;
+  width: 455.083mm;
+  font-size: 18.521mm;
+  line-height: 1.25;
+  color: #ffffff;
+}
+
+.b5 p {
+  margin: 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  max-height: 2.5em;
+}
+
+.b6 {
+  left: 26.458mm;
+  top: 115.094mm;
+  width: 455.083mm;
+  height: 2.646mm;
+  background: #ffffff;
+}
+
+.b7 {
+  top: 111.125mm;
+  left: 26.458mm;
+  width: 455.083mm;
+  font-size: 13.229mm;
+  line-height: 1.5;
+  color: #ffffff;
+}
+
+.b7 .s {
+  height: 26.458mm;
+}
+
+.b7 p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  max-height: 1.5em;
+}
+
+.b8 {
+  top: 137.583mm;
+  left: 26.458mm;
+  width: 264.583mm;
+  font-size: 10.583mm;
+  line-height: 1.5;
+  color: #c8c8c8;
+}
+
+.b8 .s {
+  height: 21.167mm;
+}
+
+.b8 p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  max-height: 1.5em;
+}
+
+.b9 {
+  top: 161.396mm;
+  left: 26.458mm;
+  width: 452.438mm;
+  font-size: 11.906mm;
+  line-height: 1.5;
+  color: #ffffff;
+}
+
+.b9 .s {
+  height: 23.813mm;
+}
+
+.b9 p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  max-height: 7.5em;
+}
+
+.b10 {
+  top: 258.233mm;
+  left: 375.708mm;
+  width: 105.833mm;
+  font-size: 8.467mm;
+  line-height: 1.5;
+  color: #c8c8c8;
+}
+
+.b10 .s {
+  height: 16.933mm;
+}
+
+.b10 p {
+  text-align: right;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  max-height: 1.5em;
+}
