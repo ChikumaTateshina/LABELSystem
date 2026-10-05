@@ -43,6 +43,39 @@ function escapeHtml(text) {
  * fonts: このPCで利用できるフォントのファミリ名
  * notify: 利用者へ知らせたいメッセージがあるときに呼ぶ
  */
+/** テンプレートと埋め込みSVGに含まれる外部参照を列挙する。参照先へのアクセスは行わない。 */
+window.templateReferences = function templateReferences(files) {
+  const found = new Map();
+  const visited = new Set();
+  const scan = (source, origin, depth = 0) => {
+    if (depth > 8) return;
+    const add = (raw) => {
+      const value = raw.trim().replace(/&amp;/g, '&');
+      if (!value || value.startsWith('#')) return;
+      if (/^data:/i.test(value)) {
+        if (/^data:image\/svg\+xml[;,]/i.test(value) && !visited.has(value)) {
+          visited.add(value);
+          try {
+            const comma = value.indexOf(',');
+            const body = value.slice(comma + 1);
+            const text = /;base64/i.test(value.slice(0, comma))
+              ? new TextDecoder().decode(Uint8Array.from(window.atob(body), (c) => c.charCodeAt(0)))
+              : decodeURIComponent(body);
+            scan(text, origin + ' → 埋め込みSVG', depth + 1);
+          } catch { /* 壊れたデータURLは読み飛ばす */ }
+        }
+        return;
+      }
+      found.set(origin + '\n' + value, { origin, value });
+    };
+    for (const m of source.matchAll(/(?:href|src)\s*=\s*(["'])(.*?)\1/gi)) add(m[2]);
+    for (const m of source.matchAll(/url\(\s*(["']?)(.*?)\1\s*\)/gi)) add(m[2]);
+    for (const m of source.matchAll(/@import\s+(["'])(.*?)\1/gi)) add(m[2]);
+  };
+  for (const key of ['svg', 'html', 'css']) scan(files[key] ?? '', 'template.' + key);
+  return [...found.values()];
+};
+
 window.BlockEditor = function BlockEditor({ files, onChange, fonts = [], notify = () => {} }) {
   const panel = h('div', { class: 'blocks' });
   const overlay = h('div', { class: 'overlay' });
@@ -291,22 +324,29 @@ window.BlockEditor = function BlockEditor({ files, onChange, fonts = [], notify 
     );
   }
 
-  /** 使える画像は PNG と JPEG（PDFへ埋め込める形式）。大きすぎる画像は断る。 */
-  const IMAGE_TYPES = ['image/png', 'image/jpeg'];
+  /** SVG は元のベクターデータを保持する。大きすぎる画像は断る。 */
+  const IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml'];
   const IMAGE_MAX_BYTES = 8 * 1024 * 1024;
 
   /** 画像ファイルを読み込み、データURLと縦横比（高さ ÷ 幅）を返す。画像はテンプレートの中へ埋め込む。 */
   function readImage(file) {
     return new Promise((resolve, reject) => {
-      if (!IMAGE_TYPES.includes(file.type)) return reject(new Error('画像は PNG または JPEG を選択してください。'));
+      const isSvg = file.type === 'image/svg+xml' || /\.svg$/i.test(file.name);
+      if (!IMAGE_TYPES.includes(file.type) && !isSvg) return reject(new Error('画像は PNG、JPEG または SVG を選択してください。'));
       if (file.size > IMAGE_MAX_BYTES) return reject(new Error('画像が大きすぎます（8MBまで）。'));
       const reader = new FileReader();
       reader.onerror = () => reject(new Error('画像を読み込めませんでした。'));
       reader.onload = () => {
         const image = new Image();
         image.onerror = () => reject(new Error('画像として読み込めませんでした。'));
-        image.onload = () => resolve({ url: String(reader.result), ratio: image.naturalHeight / image.naturalWidth });
-        image.src = String(reader.result);
+        image.onload = () => {
+          const width = image.naturalWidth;
+          const height = image.naturalHeight;
+          if (!width || !height) return reject(new Error('画像の幅・高さを取得できませんでした。SVGに width / height または viewBox を指定してください。'));
+          const url = isSvg ? String(reader.result).replace(/^data:[^;,]*/, 'data:image/svg+xml') : String(reader.result);
+          resolve({ url, ratio: height / width, sourceName: file.name });
+        };
+        image.src = isSvg ? String(reader.result).replace(/^data:[^;,]*/, 'data:image/svg+xml') : String(reader.result);
       };
       reader.readAsDataURL(file);
     });
@@ -316,7 +356,7 @@ window.BlockEditor = function BlockEditor({ files, onChange, fonts = [], notify 
   function imageButton(label, onPick) {
     const picker = h('input', {
       type: 'file',
-      accept: IMAGE_TYPES.join(','),
+      accept: [...IMAGE_TYPES, '.svg'].join(','),
       hidden: true,
       onchange: (event) => {
         const [file] = event.target.files;
@@ -327,17 +367,18 @@ window.BlockEditor = function BlockEditor({ files, onChange, fonts = [], notify 
     return h('span', {}, h('button', { class: 'btn', type: 'button', onclick: () => picker.click() }, label), picker);
   }
 
-  function addImage({ url, ratio }) {
+  function addImage({ url, ratio, sourceName }) {
     const box = viewBox();
     // 用紙の3割の幅（縦長の画像は高さが収まる大きさ）で、中央に置く
     const width = Math.round(Math.min(box.w * 0.3, (box.h * 0.6) / ratio));
     const height = Math.round(width * ratio);
-    append(create('image', { x: Math.round((box.w - width) / 2), y: Math.round((box.h - height) / 2), width, height, href: url }));
+    append(create('image', { x: Math.round((box.w - width) / 2), y: Math.round((box.h - height) / 2), width, height, href: url, 'data-source-name': sourceName ?? '' }));
   }
 
   /** 画像を差し替える。幅はそのままにして、高さを新しい画像の縦横比に合わせる。 */
-  function replaceImage(block, { url, ratio }) {
+  function replaceImage(block, { url, ratio, sourceName }) {
     block.el.setAttribute('href', url);
+    block.el.setAttribute('data-source-name', sourceName ?? '');
     block.el.setAttribute('height', String(Math.round(num(block.el, 'width') * ratio)));
     commit();
     draw();
@@ -596,7 +637,15 @@ window.BlockEditor = function BlockEditor({ files, onChange, fonts = [], notify 
       );
     }
     if (block.type === 'image') {
+      const reference = el.getAttribute('href') ?? el.getAttribute('xlink:href') ?? '';
+      const embedded = reference.startsWith('data:');
+      const source = el.getAttribute('data-source-name');
       rows.push(
+        row('選択したファイル / URL', h('code', { style: 'overflow-wrap:anywhere' },
+          embedded ? (source || '元ファイル名は記録されていません') : reference)),
+        h('div', { class: 'sub' }, embedded
+          ? 'テンプレート内に埋め込み済み（元の保存場所への参照は不要です）。'
+          : '外部参照です。相対パスはテンプレートの配置場所を基準に確認してください。'),
         row('横位置 x', input('number', num(el, 'x'), setAttr(el, 'x'), { step: 1 })),
         row('縦位置 y', input('number', num(el, 'y'), setAttr(el, 'y'), { step: 1 })),
         row('幅', input('number', num(el, 'width'), setAttr(el, 'width'), { min: 1, step: 1 })),
@@ -1177,6 +1226,13 @@ window.BlockEditor = function BlockEditor({ files, onChange, fonts = [], notify 
     updateHistoryButtons();
     panel.replaceChildren(
       h('div', { class: 'actions tight' }, undoButton, redoButton, h('span', { class: 'sub' }, 'Ctrl+Z / Ctrl+Shift+Z')),
+      h('details', { class: 'external-references', open: true },
+        h('summary', {}, '外部ファイル・URLの参照'),
+        window.templateReferences(files).length
+          ? h('ul', {}, window.templateReferences(files).map(({ origin, value }) =>
+              h('li', {}, h('span', { class: 'sub' }, origin + ': '), h('code', {}, value))))
+          : h('div', { class: 'sub' }, '外部参照はありません（埋め込み画像は外部ファイルを参照しません）。'),
+      ),
       h(
         'div',
         { class: 'blocks-main' },

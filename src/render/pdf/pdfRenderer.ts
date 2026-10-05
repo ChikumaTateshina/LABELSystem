@@ -52,7 +52,7 @@ export function renderPdf(
         const width = mmToPt(lengthToMm(caption.template.width));
         const height = mmToPt(lengthToMm(caption.template.height));
         doc.addPage({ size: [width, height], margin: 0 });
-        SVGtoPDF(doc, caption.svg, 0, 0, {
+        SVGtoPDF(doc, inlineSvgImages(caption.svg), 0, 0, {
           width,
           height,
           preserveAspectRatio: 'xMidYMid meet',
@@ -63,5 +63,23 @@ export function renderPdf(
     } catch (error) {
       reject(error);
     }
+  });
+}
+
+/** SVG画像を入れ子のSVGに展開し、PDFのベクター描画へ渡す。 */
+export function inlineSvgImages(svg: string): string {
+  return svg.replace(/<image\b([^>]*)(?:\/>|>\s*<\/image>)/g, (whole, attributes: string) => {
+    const href = /(?:^|\s)(?:xlink:)?href\s*=\s*(["'])(.*?)\1/.exec(attributes);
+    if (!href || !/^data:image\/svg\+xml[;,]/i.test(href[2])) return whole;
+    const comma = href[2].indexOf(',');
+    const source = /;base64/i.test(href[2].slice(0, comma))
+      ? Buffer.from(href[2].slice(comma + 1), 'base64').toString('utf8')
+      : decodeURIComponent(href[2].slice(comma + 1));
+    const root = /<svg\b([^>]*)>([\s\S]*)<\/svg>\s*$/.exec(source);
+    if (!root) throw new Error('埋め込みSVG画像を解析できませんでした。');
+    // 外側のimageの位置と大きさを保ち、元SVGのviewBox・定義・図形を保持する。
+    const placement = attributes.replace(href[0], '').replace(/\/\s*$/, '');
+    const inner = root[1].replace(/\s(?:x|y|width|height|preserveAspectRatio)\s*=\s*(["']).*?\1/g, '');
+    return `<svg ${inner} ${placement}>${inlineSvgImages(root[2])}</svg>`;
   });
 }

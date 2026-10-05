@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "LABELSystem キャプション登録",
   "description": "Xで開いている投稿の表示名・ユーザーID・本文を、LABELSystem 用の Google スプレッドシートへ転記します。",
-  "version": "2.1.0",
+  "version": "2.1.1",
 
   "permissions": ["activeTab", "storage"],
   "host_permissions": [
