@@ -779,9 +779,9 @@ function renderEditor(files, isNew) {
     const doc = frame.contentDocument;
     const caption = doc?.querySelector('.caption');
     if (!caption) return;
-    doc.body.style.display = 'block';
+    // 余白と地の色はプレビューだけのもの。出力されるHTMLには入れない
     doc.body.style.padding = `${PREVIEW_MARGIN}px`;
-    caption.style.margin = '0';
+    doc.body.style.background = '#e8e8e4';
     const available = frame.clientWidth - SCROLLBAR;
     const needed = caption.offsetWidth + PREVIEW_MARGIN * 2;
     doc.documentElement.style.zoom = String(Math.min(1, available / needed));

@@ -21,27 +21,15 @@ function fontFaceCss(fontFaces: NonNullable<HtmlOptions['fontFaces']>): string {
 function baseCss(width: string, height: string): string {
   return `*, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
-body {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8mm;
-  padding: 8mm;
-  background: #e8e8e4;
-}
 .caption {
-  flex: none;
   position: relative;
-  /* 中央に寄せる。表示幅が用紙より狭いときは左端から並べ、左側が画面の外へ切れないようにする */
-  margin: 0 auto;
   width: var(--caption-width);
   height: var(--caption-height);
   overflow: hidden;
-  background: #fff;
 }
 .caption--svg > svg { display: block; width: 100%; height: 100%; }
 @page { size: ${width} ${height}; margin: 0; }
 @media print {
-  body { display: block; padding: 0; background: none; }
   .caption { break-after: page; break-inside: avoid; }
 }`;
 }
