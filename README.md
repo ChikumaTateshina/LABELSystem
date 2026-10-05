@@ -6,6 +6,8 @@ Google スプレッドシートにまとめた作品情報（タイトル・ユ�
 美術館・写真展の作品キャプションを想定したテンプレートへ差し込み、
 **SVG / PDF / PNG / HTML** として出力します（VRChatワールドでの展示・印刷の両方を想定）。
 
+紹介ページ: <https://chikumatateshina.github.io/LABELSystem/>
+
 構成は3つだけです。
 
 | 部品 | 役割 |
